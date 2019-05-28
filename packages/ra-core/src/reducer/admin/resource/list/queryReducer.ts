@@ -21,7 +21,7 @@ const queryReducer: Reducer<ListParams> = (
 ) => {
     switch (type) {
         case SET_SORT:
-            if (payload === previousState.sort) {
+            if (payload.sort === previousState.sort) {
                 return {
                     ...previousState,
                     order: oppositeOrder(previousState.order),
@@ -31,8 +31,8 @@ const queryReducer: Reducer<ListParams> = (
 
             return {
                 ...previousState,
-                sort: payload,
-                order: SORT_ASC,
+                sort: payload.sort,
+                order: payload.order || SORT_ASC,
                 page: 1,
             };
 
@@ -40,7 +40,7 @@ const queryReducer: Reducer<ListParams> = (
             return { ...previousState, page: payload };
 
         case SET_PER_PAGE:
-            return { ...previousState, perPage: payload };
+            return { ...previousState, page: 1, perPage: payload };
 
         case SET_FILTER: {
             return { ...previousState, page: 1, filter: payload };

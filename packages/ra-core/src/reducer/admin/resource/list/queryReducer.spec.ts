@@ -1,5 +1,5 @@
 import assert from 'assert';
-import queryReducer from './queryReducer';
+import queryReducer, { SORT_ASC, SORT_DESC } from './queryReducer';
 
 describe('Query Reducer', () => {
     describe('SET_PAGE action', () => {
@@ -62,6 +62,99 @@ describe('Query Reducer', () => {
             const updatedState = queryReducer(
                 { page: 3 },
                 { type: 'SET_FILTER', payload: {} }
+            );
+            assert.equal(updatedState.page, 1);
+        });
+    });
+    describe('SET_SORT action', () => {
+        it('should set SORT_ASC order by default when sort value is new', () => {
+            const updatedState = queryReducer(
+                {},
+                {
+                    type: 'SET_SORT',
+                    payload: { sort: 'foo' },
+                }
+            );
+            assert.deepEqual(updatedState, {
+                sort: 'foo',
+                order: SORT_ASC,
+                page: 1,
+            });
+        });
+        it('should set order by payload.order value when sort value is new', () => {
+            const updatedState = queryReducer(
+                {},
+                {
+                    type: 'SET_SORT',
+                    payload: { sort: 'foo', order: SORT_DESC },
+                }
+            );
+            assert.deepEqual(updatedState, {
+                sort: 'foo',
+                order: SORT_DESC,
+                page: 1,
+            });
+        });
+        it("should set order as the opposite of the one in previous state when sort hasn't change", () => {
+            const updatedState = queryReducer(
+                {
+                    sort: 'foo',
+                    order: SORT_DESC,
+                    page: 1,
+                },
+                {
+                    type: 'SET_SORT',
+                    payload: { sort: 'foo' },
+                }
+            );
+            assert.deepEqual(updatedState, {
+                sort: 'foo',
+                order: SORT_ASC,
+                page: 1,
+            });
+        });
+        it("should set order as the opposite of the one in previous state even if order is specified in the payload when sort hasn't change", () => {
+            const updatedState = queryReducer(
+                {
+                    sort: 'foo',
+                    order: SORT_DESC,
+                    page: 1,
+                },
+                {
+                    type: 'SET_SORT',
+                    payload: { sort: 'foo', order: SORT_DESC },
+                }
+            );
+            assert.deepEqual(updatedState, {
+                sort: 'foo',
+                order: SORT_ASC,
+                page: 1,
+            });
+        });
+    });
+    describe('SET_PER_PAGE action', () => {
+        it('should update per page count', () => {
+            const updatedState = queryReducer(
+                {
+                    perPage: 10,
+                },
+                {
+                    type: 'SET_PER_PAGE',
+                    payload: 25,
+                }
+            );
+            assert.equal(updatedState.perPage, 25);
+        });
+        it('should reset page to 1', () => {
+            const updatedState = queryReducer(
+                {
+                    page: 5,
+                    perPage: 10,
+                },
+                {
+                    type: 'SET_PER_PAGE',
+                    payload: 25,
+                }
             );
             assert.equal(updatedState.page, 1);
         });
